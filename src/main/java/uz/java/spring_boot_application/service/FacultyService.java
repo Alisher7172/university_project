@@ -30,7 +30,7 @@ public class FacultyService {
         // for each bilan
         for (Faculty faculty : list) {
             FacultyResponse facultyResponse = new FacultyResponse();
-            facultyResponse.setId(facultyResponse.getId());
+            facultyResponse.setId(faculty.getId());
             facultyResponse.setName(faculty.getName());
             facultyResponse.setAddress(faculty.getAddress());
 //            facultyResponse.setUniversityId(faculty.getUniversity().getId());
@@ -39,7 +39,7 @@ public class FacultyService {
             UniversityResponse build = UniversityResponse.builder()
                     .id(university.getId())
                     .name(university.getName())
-                    .phone(university.getPhone())
+                    .phoneNumber(university.getPhone())
                     .email(university.getEmail())
                     .logo(university.getLogo())
                     .build();
@@ -67,7 +67,7 @@ public class FacultyService {
                 .university(UniversityResponse.builder()
                         .id(university.getId())
                         .name(university.getName())
-                        .phone(university.getPhone())
+                        .phoneNumber(university.getPhone())
                         .email(university.getEmail())
                         .address(university.getAddress())
                         .build())

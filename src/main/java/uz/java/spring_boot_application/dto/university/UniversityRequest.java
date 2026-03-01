@@ -2,10 +2,8 @@ package uz.java.spring_boot_application.dto.university;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
@@ -13,13 +11,15 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UniversityRequest {
     @NotNull(message = "name.must.not.be.null")
     @NotBlank(message = "name.must.not.be.blank")
-    private String name;
-    private String address;
-    private String phone;
-    private String email;
-    private String logo;
-    private List<String> attachmentUrls;
+     String name;
+     String address;
+     String phone;
+     String email;
+     String logo;
+     String website;
+     List<String> attachmentUrls;
 }
