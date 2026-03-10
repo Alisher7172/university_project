@@ -6,6 +6,7 @@ import uz.java.spring_boot_application.dto.faculty.FacultyRequest;
 import uz.java.spring_boot_application.dto.faculty.FacultyResponse;
 import uz.java.spring_boot_application.entities.Faculty;
 import uz.java.spring_boot_application.entities.University;
+import uz.java.spring_boot_application.exception.GenericNotFoundException;
 import uz.java.spring_boot_application.mapper.FacultyMapper;
 import uz.java.spring_boot_application.repository.FacultyRepository;
 import uz.java.spring_boot_application.repository.UniversityRepository;
@@ -27,14 +28,14 @@ public class FacultyService {
 
     public FacultyResponse getOne(Long id) {
         Faculty faculty = facultyRepository.findById(id).orElseThrow(() ->
-                new RuntimeException("Faculty not found")
+                new GenericNotFoundException("Faculty not found")
         );
         return mapper.toResponse(faculty);
     }
 
     public Long create(FacultyRequest request) {
         universityRepository.findById(request.getUniversityId()).orElseThrow(
-                () -> new RuntimeException("University not found")
+                () -> new GenericNotFoundException("University not found")
         );
         Faculty faculty = mapper.toEntity(request);
         facultyRepository.save(faculty);
@@ -43,12 +44,12 @@ public class FacultyService {
 
     public Long update(Long id, FacultyRequest request) {
         var faculty = facultyRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Faculty not found")
+                () -> new GenericNotFoundException("Faculty not found")
         );
         mapper.updateFromRequest(request, faculty);
         if (request.getUniversityId() != null) {
             University university = universityRepository.findById(request.getUniversityId()).orElseThrow(
-                    () -> new RuntimeException("University not found")
+                    () -> new GenericNotFoundException("University not found")
             );
             faculty.setUniversity(university);
         }
@@ -59,7 +60,7 @@ public class FacultyService {
     public Boolean delete(Long id) {
         var faculty = facultyRepository.findById(id).orElse(null);
         if (faculty == null)
-            throw new RuntimeException("Faculty not found");
+            throw new GenericNotFoundException("Faculty not found");
         // CTRL + alt + L bossa kodni style ini taxlab beradi Intellij
         // CTRL + alt + O keraksiz import va code lani tozalaydi
         faculty.markAsDeleted();

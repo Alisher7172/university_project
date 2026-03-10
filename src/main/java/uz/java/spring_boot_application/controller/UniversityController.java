@@ -25,7 +25,7 @@ public class UniversityController {
         List<UniversityResponse> all = universityService.getAll();
         return ResponseEntity.ok(all);
     }
-// Ctrl + alt + left  1 ta orqaga qaytaradi
+    // Ctrl + alt + left  1 ta orqaga qaytaradi
     @GetMapping("/{id}")
     public ResponseEntity<UniversityResponse> getOne(@PathVariable Long id) {
         return ResponseEntity.ok(universityService.getOne(id));
