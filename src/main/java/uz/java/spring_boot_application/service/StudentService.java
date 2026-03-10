@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uz.java.spring_boot_application.dto.student.StudentRequest;
 import uz.java.spring_boot_application.dto.student.StudentResponse;
 import uz.java.spring_boot_application.entities.Student;
+import uz.java.spring_boot_application.exception.GenericNotFoundException;
 import uz.java.spring_boot_application.mapper.StudentMapper;
 import uz.java.spring_boot_application.repository.StudentRepository;
 
@@ -25,7 +26,7 @@ public class StudentService {
 
     public StudentResponse getOne(Long id) {
         Student student = studentRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("student not found")
+                () -> new GenericNotFoundException("student.not.found")
         );
         return studentMapper.toResponse(student);
     }
