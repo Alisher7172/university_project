@@ -35,7 +35,7 @@ public class FacultyService {
 
     public Long create(FacultyRequest request) {
         universityRepository.findById(request.getUniversityId()).orElseThrow(
-                () -> new GenericNotFoundException("University not found")
+                () -> new GenericNotFoundException("university.not.found")
         );
         Faculty faculty = mapper.toEntity(request);
         facultyRepository.save(faculty);
@@ -44,12 +44,12 @@ public class FacultyService {
 
     public Long update(Long id, FacultyRequest request) {
         var faculty = facultyRepository.findById(id).orElseThrow(
-                () -> new GenericNotFoundException("Faculty not found")
+                () -> new GenericNotFoundException("faculty.not.found")
         );
         mapper.updateFromRequest(request, faculty);
         if (request.getUniversityId() != null) {
             University university = universityRepository.findById(request.getUniversityId()).orElseThrow(
-                    () -> new GenericNotFoundException("University not found")
+                    () -> new GenericNotFoundException("university.not.found")
             );
             faculty.setUniversity(university);
         }
@@ -60,7 +60,7 @@ public class FacultyService {
     public Boolean delete(Long id) {
         var faculty = facultyRepository.findById(id).orElse(null);
         if (faculty == null)
-            throw new GenericNotFoundException("Faculty not found");
+            throw new GenericNotFoundException("faculty.not.found");
         // CTRL + alt + L bossa kodni style ini taxlab beradi Intellij
         // CTRL + alt + O keraksiz import va code lani tozalaydi
         faculty.markAsDeleted();

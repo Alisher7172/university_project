@@ -12,7 +12,6 @@ import uz.java.spring_boot_application.util.Translator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @ControllerAdvice
 //@Slf4j
@@ -24,17 +23,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleError(final MethodArgumentNotValidException ex) {
 //        log.error("MethodArgumentNotValidException on: {}", ErrorUtil.getStacktrace(ex));
-        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(fieldError ->
-                {
-                    if (!translator.toLocale(fieldError.getDefaultMessage()).equals(fieldError.getDefaultMessage())) {
-                        return Objects.requireNonNull(translator.toLocale(fieldError.getDefaultMessage()));
-                    } else {
-                        return fieldError.getField() + ": " + fieldError.getDefaultMessage();
-                    }
-
-                }).toList();
-        return new ResponseEntity<>(Map.of("message", errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        String message = ex.getMessage();
+        return new ResponseEntity<>(Map.of("message", message), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(GenericNotFoundException.class)
