@@ -16,6 +16,8 @@ public class StudentRequest {
     private Integer age;
     private String gender;
     private LocalDate birthDate;
+    @NotNull(message = "firstname.must.not.be.null")
+    @NotBlank(message = "firstname.must.not.be.blank")
     private String firstName;
     private String lastName;
     private String email;

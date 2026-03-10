@@ -7,7 +7,7 @@ import uz.java.spring_boot_application.entities.Teacher;
 
 @Mapper(componentModel = "spring")
 public interface TeacherMapper {
-    @Mapping(source="subject.id", target = "subjectId")
+    @Mapping(source="subjects.id", target = "subjectId")
     @Mapping(source="faculty.id", target = "facultyId")
     @Mapping(source="phone", target = "userResponse.phone")
     @Mapping(source="firstName", target = "userResponse.firstName")
@@ -21,6 +21,6 @@ public interface TeacherMapper {
     void updateFromRequest(TeacherRequest request, @MappingTarget Teacher teacher);
 
     @Mapping(source = "subjectId", target = "subjects.id")
-    @Mapping(source = "facultyId", target = "faculty,id.")
+    @Mapping(source = "facultyId", target = "faculty.id")
     Teacher toEntity(TeacherRequest teacherRequest);
 }

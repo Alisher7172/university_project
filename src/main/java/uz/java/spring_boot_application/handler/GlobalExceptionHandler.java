@@ -1,15 +1,14 @@
 package uz.java.spring_boot_application.handler;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uz.java.spring_boot_application.exception.GenericNotFoundException;
+import uz.java.spring_boot_application.util.Translator;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-//    private final Translator translator;
+    private final Translator translator;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleError(final MethodArgumentNotValidException ex) {

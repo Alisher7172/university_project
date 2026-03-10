@@ -8,7 +8,7 @@ import uz.java.spring_boot_application.entities.Subjects;
 @Mapper(componentModel = "spring")
 public interface SubjectMapper {
 
-    @Mapping(source = "name", target = "firstName")
+    @Mapping(source = "name", target = "subjectName")
     @Mapping(source = "description", target = "description")
     SubjectResponse toResponse(Subjects subjects);
 

@@ -28,7 +28,7 @@ public class FacultyService {
 
     public FacultyResponse getOne(Long id) {
         Faculty faculty = facultyRepository.findById(id).orElseThrow(() ->
-                new GenericNotFoundException("Faculty not found")
+                new GenericNotFoundException("faculty.not.found")
         );
         return mapper.toResponse(faculty);
     }
