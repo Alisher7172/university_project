@@ -1,34 +1,60 @@
 package uz.java.spring_boot_application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.java.spring_boot_application.dto.group.GroupRequest;
 import uz.java.spring_boot_application.dto.group.GroupResponse;
 import uz.java.spring_boot_application.entities.Group;
+import uz.java.spring_boot_application.mapper.GroupMapper;
+import uz.java.spring_boot_application.repository.FacultyRepository;
 import uz.java.spring_boot_application.repository.GroupRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GroupService {
 
     private final GroupRepository groupRepository;
-
-    public GroupService(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
+    private final GroupMapper groupMapper;
+    private final FacultyRepository facultyRepository;
 
     public List<GroupResponse> getAll() {
         List<Group> all = groupRepository.findAll();
-        List<Group> allNotDeletedGroups = all.stream().filter(g -> !g.isDeleted()).toList();
-        List<GroupResponse> response = new ArrayList<>();
-        for (Group group : allNotDeletedGroups) {
-            GroupResponse groupResponse = new GroupResponse();
-            groupResponse.setId(group.getId());
-            groupResponse.setName(group.getName());
-            groupResponse.setGroupNumber(group.getGroupNumber());
-            groupResponse.setFacultyId(group.getFaculty().getId());
-            response.add(groupResponse);
-        }
-        return response;
+        return all.stream().map(groupMapper::toResponse).toList();
+    }
+
+    public GroupResponse getOne(Long id) {
+        Group group = groupRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Group not found")
+        );
+        return groupMapper.toResponse(group);
+    }
+
+    public Long create(GroupRequest request) {
+        facultyRepository.findById(request.getFacultyId()).orElseThrow(
+                () -> new RuntimeException("Faculty not found")
+        );
+        Group group = groupMapper.toEntity(request);
+        Group save = groupRepository.save(group);
+        return save.getId();
+    }
+
+    public Boolean update(Long id, GroupRequest request) {
+        Group group = groupRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Group not found")
+        );
+        groupMapper.updateFromRequest(request, group);
+        groupRepository.save(group);
+        return true;
+    }
+
+    public Boolean delete(Long id) {
+        Group group = groupRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Group not found")
+        );
+        group.markAsDeleted();
+        groupRepository.save(group);
+        return true;
     }
 }
