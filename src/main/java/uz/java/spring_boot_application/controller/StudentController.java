@@ -33,4 +33,14 @@ public class StudentController {
         return new ResponseEntity<>(studentService.create(request), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@RequestBody StudentRequest request, @PathVariable Long id){
+        return  ResponseEntity.ok(studentService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        return ResponseEntity.ok(studentService.delete(id));
+    }
+
 }

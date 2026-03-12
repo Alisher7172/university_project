@@ -1,6 +1,7 @@
 package uz.java.spring_boot_application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uz.java.spring_boot_application.dto.student.StudentRequest;
 import uz.java.spring_boot_application.dto.student.StudentResponse;
@@ -36,5 +37,24 @@ public class StudentService {
         Student entity = studentMapper.toEntity(request);
         Student save = studentRepository.save(entity);
         return save.getId();
+    }
+
+    public Long update(Long id, StudentRequest request) {
+        Student student = studentRepository.findById(id).orElseThrow(
+                () -> new GenericNotFoundException("student.not.found")
+        );
+
+        studentMapper.updateFromRequest(request, student);
+        Student save = studentRepository.save(student);
+        return save.getId();
+    }
+
+    public Boolean delete(Long id) {
+        Student student = studentRepository.findById(id).orElseThrow(
+                () -> new GenericNotFoundException("student.not.found")
+        );
+        student.markAsDeleted();
+        studentRepository.save(student);
+        return true;
     }
 }
