@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import uz.java.spring_boot_application.exception.GenericNotFoundException;
 import uz.java.spring_boot_application.util.Translator;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,14 @@ public class GlobalExceptionHandler {
         String message = translator.toLocale(e.getMessage());
         return new ResponseEntity<>(Map.of("message", List.of(message)), new HttpHeaders(),
                 HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(final AccessDeniedException e) {
+        String message = translator.toLocale(e.getMessage());
+        return new ResponseEntity<>(Map.of("message", List.of(message)), new HttpHeaders(),
+                HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({RuntimeException.class, Throwable.class})

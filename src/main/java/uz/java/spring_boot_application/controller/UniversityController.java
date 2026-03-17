@@ -3,6 +3,7 @@ package uz.java.spring_boot_application.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.java.spring_boot_application.dto.university.UniversityFilter;
 import uz.java.spring_boot_application.dto.university.UniversityRequest;
 import uz.java.spring_boot_application.dto.university.UniversityResponse;
 import uz.java.spring_boot_application.service.UniversityService;
@@ -21,8 +22,12 @@ public class UniversityController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UniversityResponse>> getAll() {
-        List<UniversityResponse> all = universityService.getAll();
+    public ResponseEntity<List<UniversityResponse>> getAll(@RequestParam(required = false) String phone,
+                                                           @RequestParam(required = false) String name,
+                                                           @RequestParam Integer page,
+                                                           @RequestParam Integer limit,
+                                                           @RequestParam(required = false) String sortBy) {
+        List<UniversityResponse> all = universityService.getAll(new UniversityFilter(phone, name, page, limit, sortBy));
         return ResponseEntity.ok(all);
     }
     // Ctrl + alt + left  1 ta orqaga qaytaradi

@@ -1,7 +1,11 @@
 package uz.java.spring_boot_application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import uz.java.spring_boot_application.dto.faculty.FacultyFilter;
 import uz.java.spring_boot_application.dto.faculty.FacultyRequest;
 import uz.java.spring_boot_application.dto.faculty.FacultyResponse;
 import uz.java.spring_boot_application.entities.Faculty;
@@ -21,9 +25,20 @@ public class FacultyService {
     private final UniversityRepository universityRepository;
     private final FacultyMapper mapper;
 
-    public List<FacultyResponse> getAll() {
-        List<Faculty> list = facultyRepository.findAllCustom();
-        return list.stream().map(mapper::toResponse).toList();
+    public List<FacultyResponse> getAll(FacultyFilter filter) {
+        int page = filter.page() != null ? filter.page() : 0;
+        int limit = filter.limit() != null ? filter.limit() : 10;
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                limit,
+                Sort.by(filter.sortBy() != null ? filter.sortBy() : "id").ascending()
+        );
+        Page<Faculty> allCustom = null;
+        if (filter.name() == null)
+             allCustom = facultyRepository.findAllCustom(pageRequest);
+        else
+            allCustom = facultyRepository.findAllCustomByName(filter.name(), pageRequest);
+        return allCustom.getContent().stream().map(mapper::toResponse).toList();
     }
 
     public FacultyResponse getOne(Long id) {
