@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.java.spring_boot_application.dto.faculty.FacultyFilter;
 import uz.java.spring_boot_application.dto.faculty.FacultyRequest;
 import uz.java.spring_boot_application.dto.faculty.FacultyResponse;
 import uz.java.spring_boot_application.service.FacultyService;
@@ -18,8 +19,11 @@ public class FacultyController {
     private FacultyService facultyService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<FacultyResponse>> getAll() {
-        return ResponseEntity.ok(facultyService.getAll());
+    public ResponseEntity<List<FacultyResponse>> getAll(@RequestParam Integer page,
+                                                        @RequestParam Integer limit,
+                                                        @RequestParam(required = false) String sortBy,
+                                                        @RequestParam(required = false) String name) {
+        return ResponseEntity.ok(facultyService.getAll(new FacultyFilter(page, limit, sortBy, name)));
     }
 
     @GetMapping("/{id}")

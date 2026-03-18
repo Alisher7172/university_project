@@ -1,15 +1,20 @@
 package uz.java.spring_boot_application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import uz.java.spring_boot_application.dto.university.UniversityFilter;
 import uz.java.spring_boot_application.dto.university.UniversityRequest;
 import uz.java.spring_boot_application.dto.university.UniversityResponse;
 import uz.java.spring_boot_application.entities.University;
 import uz.java.spring_boot_application.mapper.UniversityMapper;
 import uz.java.spring_boot_application.repository.UniversityRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,9 +26,20 @@ public class UniversityService {
     private final UniversityMapper universityMapper;
 
 
-    public List<UniversityResponse> getAll() {
-        return universityRepository.findAllCustom()
-                .stream().map(universityMapper::toResponse).toList();
+    public List<UniversityResponse> getAll(UniversityFilter filter) {
+        int page = filter.page() != null ? filter.page() : 0;
+        int limit = filter.limit() != null ? filter.limit() : 10;
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                limit,
+                Sort.by(filter.sortBy() != null ? filter.sortBy() : "id").ascending()
+        );
+
+        Page<University> allCustom = universityRepository.findAllCustom(filter.name() != null ? filter.name() : "",
+                filter.phone() != null ? filter.phone() : "", pageRequest);
+        if (allCustom.isEmpty())
+            return new ArrayList<>();
+        return allCustom.getContent().stream().map(universityMapper::toResponse).toList();
     }
 
     public UniversityResponse getOne(Long id) {
