@@ -12,7 +12,7 @@ public class Application {
     }
 
     // 1. Web layer  --> Controller class lar
-    // 2. Model Layer --> entity class lar
+    // 2. Model Layer --> entity class lar, dtos
     // 3. Data Access Layer --> repository, daos class lar
     // 4. Business Logic Layer --> service class lar
     // 5. Application layer --> helpers, componentalar
