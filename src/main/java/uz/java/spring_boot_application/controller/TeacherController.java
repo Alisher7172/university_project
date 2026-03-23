@@ -3,6 +3,7 @@ package uz.java.spring_boot_application.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.java.spring_boot_application.dto.user.TeacherFilter;
 import uz.java.spring_boot_application.dto.user.TeacherRequest;
 import uz.java.spring_boot_application.service.TeacherService;
 
@@ -14,8 +15,14 @@ public class TeacherController {
     private TeacherService teacherService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(teacherService.getAll());
+    public ResponseEntity<?> getAll(@RequestParam Integer page,
+                                    @RequestParam Integer limit,
+                                    @RequestParam(required = false) String sortBy,
+                                    @RequestParam(required = false) Double salary,
+                                    @RequestParam(required = false) Long subjectId,
+                                    @RequestParam(required = false) Long facultyId) {
+        return ResponseEntity.ok(teacherService.getAll(new TeacherFilter(page, limit, sortBy,
+                salary, subjectId, facultyId)));
     }
 
     @PostMapping

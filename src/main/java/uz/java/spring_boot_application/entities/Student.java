@@ -24,6 +24,6 @@ public class Student extends User {
     private Long userId;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
     private Group group;
 }

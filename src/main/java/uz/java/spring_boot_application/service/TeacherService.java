@@ -1,9 +1,12 @@
 package uz.java.spring_boot_application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import uz.java.spring_boot_application.dto.user.TeacherFilter;
 import uz.java.spring_boot_application.dto.user.TeacherRequest;
 import uz.java.spring_boot_application.dto.user.TeacherResponse;
 import uz.java.spring_boot_application.entities.Faculty;
@@ -25,8 +28,19 @@ public class TeacherService {
     private final SubjectRepository subjectRepository;
 
 
-    public List<TeacherResponse> getAll() {
-        List<Teacher> all = teacherRepository.findAll();
+    public List<TeacherResponse> getAll(TeacherFilter filter) {
+        int page = filter.page() != null ? filter.page() : 0;
+        int limit = filter.limit() != null ? filter.limit() : 10;
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                limit,
+                Sort.by(filter.sortBy() != null ? filter.sortBy() : "createdAt").descending()
+        );
+
+        List<Teacher> all = teacherRepository.findAllCustomWithPagination(filter.salary(),
+                filter.facultyId(),
+                filter.subjectId(),
+                pageRequest);
         return all.stream().map(teacherMapper::toResponse).toList();
     }
 
@@ -46,12 +60,12 @@ public class TeacherService {
                 () -> new RuntimeException("Teacher not found")
         );
         teacherMapper.updateFromRequest(teacherRequest, teacher);
-        if(teacherRequest.getFacultyId() != null){
+        if (teacherRequest.getFacultyId() != null) {
             facultyRepository.findById(teacherRequest.getFacultyId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found")
             );
         }
-        if(teacherRequest.getSubjectId() != null){
+        if (teacherRequest.getSubjectId() != null) {
             subjectRepository.findById(teacherRequest.getSubjectId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not found")
             );
