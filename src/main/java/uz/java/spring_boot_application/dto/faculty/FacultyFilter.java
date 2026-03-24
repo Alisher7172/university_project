@@ -10,9 +10,11 @@ import uz.java.spring_boot_application.dto.BaseFilter;
 @NoArgsConstructor
 public class FacultyFilter extends BaseFilter {
     private String name;
+    private Long universityId;
 
-    public FacultyFilter(Integer page, Integer limit, String sortBy, String name) {
+    public FacultyFilter(Integer page, Integer limit, String sortBy, String name, Long universityId) {
         super(page, limit, sortBy);
         this.name = name;
+        this.universityId = universityId;
     }
 }

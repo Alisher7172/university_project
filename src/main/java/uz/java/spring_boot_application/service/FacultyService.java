@@ -14,6 +14,8 @@ import uz.java.spring_boot_application.exception.GenericNotFoundException;
 import uz.java.spring_boot_application.mapper.FacultyMapper;
 import uz.java.spring_boot_application.repository.FacultyRepository;
 import uz.java.spring_boot_application.repository.UniversityRepository;
+import uz.java.spring_boot_application.specification.FacultySpecification;
+import uz.java.spring_boot_application.specification.SearchSpecification;
 
 import java.util.List;
 
@@ -26,19 +28,11 @@ public class FacultyService {
     private final FacultyMapper mapper;
 
     public List<FacultyResponse> getAll(FacultyFilter filter) {
-        int page = filter.getPage() != null ? filter.getPage() : 0;
-        int limit = filter.getLimit() != null ? filter.getLimit() : 10;
-        PageRequest pageRequest = PageRequest.of(
-                page,
-                limit,
-                Sort.by(filter.getSortBy() != null ? filter.getSortBy() : "id").ascending()
-        );
-        Page<Faculty> allCustom = null;
-        if (filter.getName() == null)
-             allCustom = facultyRepository.findAllCustom(pageRequest);
-        else
-            allCustom = facultyRepository.findAllCustomByName(filter.getName(), pageRequest);
-        return allCustom.getContent().stream().map(mapper::toResponse).toList();
+        FacultySpecification spec = new FacultySpecification(filter);
+        List<Faculty> all = facultyRepository.findAll(spec, SearchSpecification.getPageable(
+                filter.getPage(), filter.getLimit(), filter.getSortBy()
+        )).toList();
+        return all.stream().map(mapper::toResponse).toList();
     }
 
     public FacultyResponse getOne(Long id) {

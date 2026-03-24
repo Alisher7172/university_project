@@ -22,8 +22,9 @@ public class FacultyController {
     public ResponseEntity<List<FacultyResponse>> getAll(@RequestParam Integer page,
                                                         @RequestParam Integer limit,
                                                         @RequestParam(required = false) String sortBy,
-                                                        @RequestParam(required = false) String name) {
-        return ResponseEntity.ok(facultyService.getAll(new FacultyFilter(page, limit, sortBy, name)));
+                                                        @RequestParam(required = false) String name,
+                                                        @RequestParam(required = false) Long universityId) {
+        return ResponseEntity.ok(facultyService.getAll(new FacultyFilter(page, limit, sortBy, name, universityId)));
     }
 
     @GetMapping("/{id}")
