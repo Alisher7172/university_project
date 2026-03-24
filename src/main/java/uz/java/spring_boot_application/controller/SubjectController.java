@@ -3,6 +3,7 @@ package uz.java.spring_boot_application.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.java.spring_boot_application.dto.subject.SubjectFilter;
 import uz.java.spring_boot_application.dto.subject.SubjectRequest;
 import uz.java.spring_boot_application.service.SubjectService;
 
@@ -14,8 +15,12 @@ public class SubjectController {
     private SubjectService subjectService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllSubjects() {
-        return ResponseEntity.ok(subjectService.getAll());
+    public ResponseEntity<?> getAllSubjects(@RequestParam Integer page,
+                                            @RequestParam Integer limit,
+                                            @RequestParam(required = false) String sortBy,
+                                            @RequestParam(required = false) String name
+                                            ) {
+        return ResponseEntity.ok(subjectService.getAll(new SubjectFilter(page, limit, sortBy, name)));
     }
 
     @PostMapping()

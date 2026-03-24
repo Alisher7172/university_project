@@ -26,18 +26,18 @@ public class FacultyService {
     private final FacultyMapper mapper;
 
     public List<FacultyResponse> getAll(FacultyFilter filter) {
-        int page = filter.page() != null ? filter.page() : 0;
-        int limit = filter.limit() != null ? filter.limit() : 10;
+        int page = filter.getPage() != null ? filter.getPage() : 0;
+        int limit = filter.getLimit() != null ? filter.getLimit() : 10;
         PageRequest pageRequest = PageRequest.of(
                 page,
                 limit,
-                Sort.by(filter.sortBy() != null ? filter.sortBy() : "id").ascending()
+                Sort.by(filter.getSortBy() != null ? filter.getSortBy() : "id").ascending()
         );
         Page<Faculty> allCustom = null;
-        if (filter.name() == null)
+        if (filter.getName() == null)
              allCustom = facultyRepository.findAllCustom(pageRequest);
         else
-            allCustom = facultyRepository.findAllCustomByName(filter.name(), pageRequest);
+            allCustom = facultyRepository.findAllCustomByName(filter.getName(), pageRequest);
         return allCustom.getContent().stream().map(mapper::toResponse).toList();
     }
 
