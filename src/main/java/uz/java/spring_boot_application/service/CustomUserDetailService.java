@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uz.java.spring_boot_application.entities.User;
 import uz.java.spring_boot_application.exception.GenericNotFoundException;
 import uz.java.spring_boot_application.repository.UserRepository;
+import uz.java.spring_boot_application.security.CustomUserDetails;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
@@ -18,10 +19,10 @@ public class CustomUserDetailService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user == null)
             throw new GenericNotFoundException("user.not.found");
-        return user;
+        return new CustomUserDetails(user);
     }
 }

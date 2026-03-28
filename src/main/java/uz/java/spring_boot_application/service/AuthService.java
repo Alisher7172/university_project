@@ -1,55 +1,67 @@
 package uz.java.spring_boot_application.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import uz.java.spring_boot_application.dto.UserRegisterRequest;
-import uz.java.spring_boot_application.entities.Role;
+import uz.java.spring_boot_application.config.CustomAuthenticationEntryPoint;
+import uz.java.spring_boot_application.config.CustomAuthenticationProvider;
+import uz.java.spring_boot_application.dto.LoginResponse;
+import uz.java.spring_boot_application.entities.SessionUser;
+import uz.java.spring_boot_application.entities.Status;
 import uz.java.spring_boot_application.entities.User;
-import uz.java.spring_boot_application.exception.ValidationException;
-import uz.java.spring_boot_application.repository.RoleRepository;
+import uz.java.spring_boot_application.exception.GenericNotFoundException;
+import uz.java.spring_boot_application.repository.SessionUserRepository;
 import uz.java.spring_boot_application.repository.UserRepository;
-
-import java.util.Set;
+import uz.java.spring_boot_application.security.CustomUserDetails;
 
 @Service
 public class AuthService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-    private final CustomUserDetailService customUserDetailService;
+    private final SessionUserRepository sessionUserRepository;
+    private final JwtTokenService jwtTokenService;
+    private final CustomAuthenticationProvider authenticationProvider;
 
-    public AuthService(PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserRepository userRepository, CustomUserDetailService customUserDetailService, CustomUserDetailService customUserDetailService1) {
-        this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
+    public AuthService(UserRepository userRepository, SessionUserRepository sessionUserRepository, JwtTokenService jwtTokenService, CustomAuthenticationProvider authenticationProvider) {
         this.userRepository = userRepository;
-        this.customUserDetailService = customUserDetailService1;
+        this.sessionUserRepository = sessionUserRepository;
+        this.jwtTokenService = jwtTokenService;
+        this.authenticationProvider = authenticationProvider;
     }
 
-    public Boolean login(String username, String password) {
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
-        if (!passwordEncoder.matches(password, userDetails.getPassword()))
-            throw new ValidationException("Invalid password or username");
+    public LoginResponse login(String username, String password) {
+        Authentication authenticate = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
+                username, password
+        ));
+        CustomUserDetails userDetails = (CustomUserDetails) authenticate.getPrincipal();
+        User user = userRepository.findById(userDetails.getUserId()).orElse(null);
+        if (user == null)
+            throw new GenericNotFoundException(userDetails.getUserId().toString(), "user.not.found");
 
-        return true;
-    }
-
-    public Boolean register(UserRegisterRequest request) {
-        User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        Role role = roleRepository.findByCode("ROLE_USER");
-        if (role == null) {
-            role = new Role();
-            role.setName("User");
-            role.setCode("ROLE_USER");
-            roleRepository.save(role);
+        SessionUser sessionUser = sessionUserRepository.findByUserId(user.getId());
+        if (sessionUser != null) {
+            String accessToken = jwtTokenService.generateToken(userDetails.getUsername());
+            String refreshToken = jwtTokenService.generateToken(userDetails.getUsername());
+            sessionUser.setAccessToken(accessToken);
+            sessionUser.setRefreshToken(refreshToken);
+            sessionUser.setStatus(Status.ACTIVE);
+            sessionUserRepository.save(sessionUser);
+            return LoginResponse.builder()
+                    .accessToken(sessionUser.getAccessToken())
+                    .refreshToken(sessionUser.getRefreshToken())
+                    .build();
         }
-        user.setRoles(Set.of(role));
-        userRepository.save(user);
-        return true;
+        String accessToken = jwtTokenService.generateToken(userDetails.getUsername());
+        String refreshToken = jwtTokenService.generateToken(userDetails.getUsername());
+        sessionUserRepository.save(SessionUser.builder()
+                .user(user)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .status(Status.ACTIVE)
+                .build());
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }
